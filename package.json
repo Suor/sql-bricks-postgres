@@ -1,0 +1,40 @@
+{
+  "name": "sql-bricks-postgres",
+  "version": "0.1.0",
+  "author": "Peter Rust <peter@cornerstonenw.com>",
+  "description": "Transparent, Schemaless SQL Generation for the Postgres dialect",
+  "homepage": "https://github.com/CSNW/sql-bricks-postgres",
+  "bugs": "https://github.com/CSNW/sql-bricks-postgres/issues",
+  "scripts": {
+    "test": "mocha postgres-tests.js"
+  },
+  "main": "postgres.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CSNW/sql-bricks-postgres.git"
+  },
+  "keywords": [
+    "sql",
+    "generation",
+    "generate",
+    "query",
+    "pg",
+    "postgres",
+    "builder",
+    "select",
+    "insert",
+    "update",
+    "delete"
+  ],
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "underscore": "1.4.x",
+    "sql-bricks": "1.0.0-beta.2"
+  },
+  "devDependencies": {
+    "mocha": "1.13.x"
+  },
+  "license": "MIT"
+}
