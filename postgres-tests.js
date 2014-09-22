@@ -57,6 +57,12 @@ describe('Postgres extension for SQLBricks', function() {
     assert.equal(del('user').using('address').where('user.addr_fk', sql('addr.pk')).toString(),
       "DELETE FROM \"user\" USING address WHERE \"user\".addr_fk = addr.pk");
   });
+
+  it('should support VALUES', function() {
+    var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]
+    assert.equal(select().from(sql.values(data)).toParams(),
+      "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
+  })
 });
 
 describe('LIMIT ... OFFSET', function() {

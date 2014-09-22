@@ -2,23 +2,26 @@
 (function() {
   "use strict";
 
-  var sql;
-  if (typeof exports != 'undefined')
+  var sql, _;
+  if (typeof exports != 'undefined') {
     sql = require('sql-bricks');
-  else
+    _ = require('underscore');
+  } else {
     sql = window.SqlBricks;
+    _ = window._;
+  }
 
   var Select = sql.select;
   var Insert = sql.insert;
   var Update = sql.update;
   var Delete = sql.delete;
 
-  Insert.prototype.returning = 
-    Update.prototype.returning = 
+  Insert.prototype.returning =
+    Update.prototype.returning =
     Delete.prototype.returning = function() {
       return this._addListArgs(arguments, '_returning');
     };
-  
+
   Delete.prototype.using = function() {
     return this._addListArgs(arguments, '_using');
   };
@@ -27,7 +30,7 @@
   Insert.defineClause('returning', returning_tmpl, {after: 'values'});
   Update.defineClause('returning', returning_tmpl, {after: 'where'});
   Delete.defineClause('returning', returning_tmpl, {after: 'where'});
-  
+
   Delete.defineClause('using', '{{#if _using}}USING {{tables _using}}{{/if}}', {after: 'delete'});
 
   // TODO: shouldn't LIMIT/OFFSET use handleValue()? Otherwise isn't it vulnerable to SQL Injection?
@@ -52,6 +55,26 @@
     {after: 'limit'}
   );
 
+  // VALUES statement for SELECT/UPDATE/DELETE ... FROM VALUES
+  function Values(_values) {
+    if (!(this instanceof Values))
+      return new Values(_values);
+
+    Values.super_.call(this, 'values');
+    this._values = _values;
+    return this;
+  }
+  sql.values = sql.inherits(Values, sql.Statement);
+  Values.defineClause = Select.defineClause;
+
+  Values.defineClause('values', function valuesClause (opts) {
+    var values = this._values.map(function (values) {
+      return '(' + sql._handleValues(_.values(values), opts).join(', ') + ')';
+    }).join(', ');
+
+    return 'VALUES ' + values;
+  });
+
 
   if (typeof exports != 'undefined')
     module.exports = sql;
@@ -59,3 +82,5 @@
     window.PostgresBricks = sql;
 
 })();
+
+
