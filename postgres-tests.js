@@ -58,10 +58,33 @@ describe('Postgres extension for SQLBricks', function() {
       "DELETE FROM \"user\" USING address WHERE \"user\".addr_fk = addr.pk");
   });
 
-  it('should support VALUES', function() {
-    var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]
-    assert.equal(select().from(sql.values(data)).toParams(),
-      "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
+  describe('Values', function () {
+    it('should work with select', function() {
+      var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]
+      assert.equal(select().from(sql.values(data)).toString(),
+        "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
+    })
+
+
+    it('should add alias', function() {
+      assert.equal(select().from(sql.values({key: 'a', val: 1}).as('v')).toString(),
+        "SELECT * FROM (VALUES ('a', 1)) v");
+    })
+
+    it('should add columns', function() {
+      assert.equal(select().from(sql.values({key: 'a', val: 1}).as('v').columns()).toString(),
+        "SELECT * FROM (VALUES ('a', 1)) v (\"key\", val)");
+    })
+
+    it('should play nice with params', function() {
+      var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]
+      assert.deepEqual(
+        update('setting s', {value: sql('v.value')})
+          .from(sql.values(data).as('v')).where('s.name', sql('v.name')).toParams(),
+        {text: 'UPDATE setting s SET value = v.value '
+             + 'FROM (VALUES ($1, $2), ($3, $4)) v WHERE s.name = v.name',
+         values: ['a', 1, 'b', 2]})
+    })
   })
 });
 

@@ -67,7 +67,7 @@
   sql.values = sql.inherits(Values, sql.Statement);
   Values.defineClause = Select.defineClause;
 
-  Values.defineClause('values', function valuesClause (opts) {
+  Values.defineClause('values', function (opts) {
     var values = this._values.map(function (values) {
       return '(' + sql._handleValues(_.values(values), opts).join(', ') + ')';
     }).join(', ');
@@ -75,6 +75,25 @@
     return 'VALUES ' + values;
   });
 
+  Values.prototype.as = function (alias) {
+    this._alias = alias;
+    return this;
+  }
+
+  Values.prototype.columns = function () {
+    this._columns = true;
+    return this;
+  }
+  Values.prototype._strAlias = function (opts) {
+    if (!this._alias) return '';
+
+    var alias = ' ' + sql._autoQuote(this._alias);
+    if (this._columns) {
+      var cols = _.keys(this._values[0]).map(sql._quoteColOrTbl).join(', ');
+      alias += ' (' + cols + ')';
+    }
+    return alias;
+  }
 
   if (typeof exports != 'undefined')
     module.exports = sql;
