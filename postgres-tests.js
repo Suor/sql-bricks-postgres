@@ -86,13 +86,19 @@ describe('Postgres extension for SQLBricks', function() {
     })
 
     it('should play nice with params', function() {
-      var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]
+      var data = [{name: 'a', value: 1}, {name: 'b', value: 2}];
       assert.deepEqual(
         update('setting s', {value: sql('v.value')})
           .from(sql.values(data).as('v')).where('s.name', sql('v.name')).toParams(),
         {text: 'UPDATE setting s SET value = v.value '
              + 'FROM (VALUES ($1, $2), ($3, $4)) v WHERE s.name = v.name',
          values: ['a', 1, 'b', 2]})
+    })
+
+    it('should add types', function() {
+      var data = {i: 1, f: 1.5, b: true, s: 'hi'};
+      assert.equal(sql.values(data).types().toParams().text,
+                   'VALUES ($1::int, $2::float, $3::bool, $4)')
     })
   })
 });

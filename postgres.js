@@ -74,12 +74,33 @@
   Values.defineClause = Select.defineClause;
 
   Values.defineClause('values', function (opts) {
+    var handleValues = this._types ? typedValues : sql._handleValues;
     var values = this._values.map(function (values) {
-      return '(' + sql._handleValues(_.values(values), opts).join(', ') + ')';
+      return '(' + handleValues(_.values(values), opts).join(', ') + ')';
     }).join(', ');
 
     return 'VALUES ' + values;
   });
+
+  Values.prototype.types = function () {
+    this._types = true;
+    return this;
+  }
+
+  function typeCoerce(val) {
+    if (typeof val === 'number') {
+      return (val % 1 ===  0) ? '::int' : '::float';
+    } else if (typeof val === 'boolean') {
+      return '::bool';
+    } else {
+      return ''
+    }
+  }
+  function typedValues(vals, opts) {
+    return vals.map(function (val) {
+      return sql._handleValue(val, opts) + typeCoerce(val);
+    });
+  }
 
   Values.prototype.as = function (alias) {
     this._alias = alias;
@@ -95,8 +116,7 @@
 
     var alias = ' ' + sql._autoQuote(this._alias);
     if (this._columns) {
-      var cols = _.keys(this._values[0]).map(sql._quoteColOrTbl).join(', ');
-      alias += ' (' + cols + ')';
+      alias += ' (' + sql._handleColumns(_.keys(this._values[0])) + ')';
     }
     return alias;
   }
