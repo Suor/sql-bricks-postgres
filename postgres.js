@@ -61,7 +61,7 @@
       return new Values(_values);
 
     Values.super_.call(this, 'values');
-    this._values = _values;
+    this._values = _.isArray(_values) ? _values : [_values];
     return this;
   }
   sql.values = sql.inherits(Values, sql.Statement);

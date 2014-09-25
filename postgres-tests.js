@@ -65,6 +65,9 @@ describe('Postgres extension for SQLBricks', function() {
         "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
     })
 
+    it('should accept single row', function() {
+      assert.equal(sql.values({key: 'a', val: 1}).toString(), "VALUES ('a', 1)");
+    })
 
     it('should add alias', function() {
       assert.equal(select().from(sql.values({key: 'a', val: 1}).as('v')).toString(),
