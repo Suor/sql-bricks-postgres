@@ -55,6 +55,12 @@
     {after: 'limit'}
   );
 
+  // UPDATE ... FROM
+  Update.prototype.from = function() {
+    return this._addListArgs(arguments, '_from');
+  };
+  Update.defineClause('from', '{{#if _from}}FROM {{tables _from}}{{/if}}', {after: 'set'});
+
   // VALUES statement for SELECT/UPDATE/DELETE ... FROM VALUES
   function Values(_values) {
     if (!(this instanceof Values))

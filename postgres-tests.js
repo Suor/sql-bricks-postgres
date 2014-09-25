@@ -53,10 +53,16 @@ describe('Postgres extension for SQLBricks', function() {
       "DELETE FROM \"user\" WHERE lname = 'Flintstone' RETURNING *");
   });
 
-  it('should generate a DELETE with USING', function() {
+  it('should handle DELETE ... USING', function() {
     assert.equal(del('user').using('address').where('user.addr_fk', sql('addr.pk')).toString(),
       "DELETE FROM \"user\" USING address WHERE \"user\".addr_fk = addr.pk");
   });
+
+  it('should handle UPDATE ... FROM', function() {
+    assert.equal(update('setting', {value: sql('V.value')})
+                  .from('val as V').where({name: sql('V.name')}).toString(),
+      'UPDATE setting SET value = V.value FROM val as V WHERE name = V.name')
+  })
 
   describe('Values', function () {
     it('should work with select', function() {
