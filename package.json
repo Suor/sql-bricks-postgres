@@ -31,11 +31,11 @@
     "node": "*"
   },
   "dependencies": {
-    "underscore": "1.4.x",
+    "underscore": "1.7.x",
     "sql-bricks": "1.0.2"
   },
   "devDependencies": {
-    "mocha": "1.13.x"
+    "mocha": "1.21.x"
   },
   "license": "MIT"
 }
