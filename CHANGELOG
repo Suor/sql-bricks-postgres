@@ -1,0 +1,7 @@
+0.2.0
+- added VALUES statement
+- added UPDATE ... FROM support
+- updated dependencies
+
+0.1.0
+- initial version (Peter Rust)
