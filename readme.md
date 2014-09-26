@@ -64,14 +64,31 @@ sql.delete('user').using('address').where('user.addr_fk', sql('address.pk')).toS
 
 ### FROM VALUES
 
+`VALUES` statement is a handy way to provide data with a query. It is most known in a context of `INSERT`, but could be used for other things like altering selects and doing mass updates:
+
 ```js
 var data = [{name: 'a', value: 1}, {name: 'b', value: 2}];
 sql.select().from(sql.values(data)).toString();
 // -> "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
 
-var values = sql.values({name: 'a', value: 1}).as('v').columns();
 sql.update('setting s', {value: sql('v.value')})
-   .from(values).where('s.name', sql('v.name')}).toString()
+   .from(sql.values({name: 'a', value: 1}).as('v').columns())
+   .where('s.name', sql('v.name')}).toString()
 // -> "UPDATE setting s SET value = v.value
 //     FROM (VALUES ('a', 1)) v (name, value) WHERE s.name = v.name"
+```
+
+Sometimes you need types on values columns for query to work. You can use `.types()` method to provide them:
+
+```js
+var data = {i: 1, f: 1.5, b: true, s: 'hi'};
+insert('domain', _.keys(data))
+    .select().from(sql.values(data).as('v').columns().types())
+    .where(sql.not(sql.exists(
+        select('1').from('domain d')
+        .where({'d.job_id': sql('v.job_id'), 'd.domain': sql('v.domain')}))))
+// INSERT INTO domain (i, f, b, s)
+// SELECT * FROM (VALUES ($5::int, $6::float, $7::bool, $8)) v (i, f, b, s)
+// WHERE NOT EXISTS
+//    (SELECT 1 FROM domain d WHERE d.job_id = v.job_id AND d.domain = v.domain)
 ```
