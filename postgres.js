@@ -82,6 +82,7 @@
     return 'VALUES ' + values;
   });
 
+  // Sometimes values need to be typed
   Values.prototype.types = function () {
     this._types = true;
     return this;
@@ -102,16 +103,14 @@
     });
   }
 
-  Values.prototype.as = function (alias) {
-    this._alias = alias;
-    return this;
-  }
-
+  // VALUES alias and columns
   Values.prototype.columns = function () {
     this._columns = true;
     return this;
   }
-  Values.prototype._strAlias = function (opts) {
+  Values.prototype.as = Select.prototype.as;
+  Values.prototype._toNestedString = Select.prototype._toNestedString;
+  Values.prototype._aliasToString = function (opts) {
     if (!this._alias) return '';
 
     var alias = ' ' + sql._autoQuote(this._alias);
