@@ -19,8 +19,8 @@ var sql = require('sql-bricks-postgres');
 // in the browser:
 var sql = PostgresBricks;
 
-sql.select().from('user').where({name: 'Fred Flintstone'}).toParams();
-// -> {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred Flintstone']}
+sql.select().from('user').where({name: 'Fred'}).toParams();
+// -> {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred']}
 ```
 
 You can read about basic flavor of how this thing works in [sql-bricks documentation](http://csnw.github.io/sql-bricks). Here go PostgreSQL specifics.
@@ -57,7 +57,8 @@ sql.update('setting', {value: sql('V.value')})
 ### DELETE ... USING
 
 ```js
-sql.delete('user').using('address').where('user.addr_fk', sql('address.pk')).toString();
+sql.delete('user').using('address').where('user.addr_fk', sql('address.pk'))
+   .toString();
 // -> 'DELETE FROM "user" USING address WHERE "user".addr_fk = address.pk');
 ```
 
