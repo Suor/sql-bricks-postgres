@@ -1,3 +1,7 @@
+0.2.1
+- updated required sql-bricks version.
+  New version fixed some issues with INSERT ... SELECT queries.
+
 0.2.0
 - added VALUES statement
 - added UPDATE ... FROM support
