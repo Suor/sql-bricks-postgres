@@ -92,3 +92,8 @@ insert('domain', _.keys(data))
 // WHERE NOT EXISTS
 //    (SELECT 1 FROM domain d WHERE d.job_id = v.job_id AND d.domain = v.domain)
 ```
+
+
+## See also
+
+[pg-bricks](https://github.com/Suor/pg-bricks) - A PostgreSQL client based on this library, handling connections, transactions, query execution and more.
