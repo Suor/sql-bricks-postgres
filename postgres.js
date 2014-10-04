@@ -19,6 +19,10 @@
     return sql.apply(this, arguments);
   }
   pgsql = sql.inherits(pgsql, sql);
+  for (var p in sql) {
+    if (sql.hasOwnProperty(p))
+      pgsql[p] = sql[p];
+  }
 
 
   function construct(constructor, args) {

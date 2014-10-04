@@ -109,6 +109,11 @@ describe('Postgres extension for SQLBricks', function() {
     assert.equal(base.update.from, undefined);
     assert(sql.insert.prototype.clauses !== base.insert.prototype.clauses)
   })
+
+  it('should save where constructors', function() {
+    assert.equal(select().from('user').where(sql.or({'name': 'Fred'}, {'name': 'Bob'})).toString(),
+      "SELECT * FROM \"user\" WHERE name = 'Fred' OR name = 'Bob'");
+  })
 });
 
 describe('LIMIT ... OFFSET', function() {
