@@ -101,6 +101,14 @@ describe('Postgres extension for SQLBricks', function() {
                    'VALUES ($1::int, $2::float, $3::bool, $4)')
     })
   })
+
+  it('should not change base', function() {
+    var base = require('sql-bricks');
+    assert.equal(base.values, undefined);
+    assert.equal(base.insert.returning, undefined);
+    assert.equal(base.update.from, undefined);
+    assert(sql.insert.prototype.clauses !== base.insert.prototype.clauses)
+  })
 });
 
 describe('LIMIT ... OFFSET', function() {
