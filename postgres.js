@@ -112,17 +112,30 @@
   Values.defineClause = Select.defineClause;
 
   Values.defineClause('values', function (opts) {
-    var handleValues = this._types ? typedValues : sql._handleValues;
-    var values = this._values.map(function (values) {
-      return '(' + handleValues(_.values(values), opts).join(', ') + ')';
+    var types = this._types;
+    var handleRow = types === true ? function (row, opts) {
+        return typedValues(_.values(row), opts)
+      }
+      : types ? function (row, opts) {
+        return _.map(row, function (val, field) {
+          return (sql._handleValue(val, opts)
+                  + (types[field] ? '::' + types[field] : typeCoerce(val)));
+        })
+      }
+      : function (row, opts) {
+        return sql._handleValues(_.values(row), opts);
+      }
+
+    var values = this._values.map(function (row) {
+      return '(' + handleRow(row, opts).join(', ') + ')';
     }).join(', ');
 
     return 'VALUES ' + values;
   });
 
   // Sometimes values need to be typed
-  Values.prototype.types = function () {
-    this._types = true;
+  Values.prototype.types = function (types) {
+    this._types = types || true;
     return this;
   }
 

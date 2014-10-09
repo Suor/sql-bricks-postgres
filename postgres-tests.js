@@ -96,9 +96,15 @@ describe('Postgres extension for SQLBricks', function() {
     })
 
     it('should add types', function() {
-      var data = {i: 1, f: 1.5, b: true, s: 'hi'};
+      var data = {i: 1, f: 1.5, b: true, s: 'hi', n: null};
       assert.equal(sql.values(data).types().toParams().text,
-                   'VALUES ($1::int, $2::float, $3::bool, $4)')
+                   'VALUES ($1::int, $2::float, $3::bool, $4, $5)')
+    })
+
+    it('should add explicit types', function() {
+      var data = {n: null};
+      assert.equal(sql.values(data).types({n: 'int'}).toParams().text,
+                   'VALUES ($1::int)')
     })
   })
 
