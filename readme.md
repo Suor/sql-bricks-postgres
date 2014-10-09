@@ -94,6 +94,13 @@ insert('domain', _.keys(data))
 //    (SELECT 1 FROM domain d WHERE d.job_id = v.job_id AND d.domain = v.domain)
 ```
 
+When type can't detected by value, e.g. you have `null`, no cast will be added.
+However, you can specify types explicitly:
+
+```js
+sql.values({field: null}).types({field: 'int'}).toString()
+// VALUES (null::int)
+```
 
 ## See also
 
