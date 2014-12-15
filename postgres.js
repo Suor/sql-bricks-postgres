@@ -12,46 +12,12 @@
   }
 
   // We create this wrapper to not contaminate original sql namespace
-  function pgsql(str) {
-    if (!(this instanceof pgsql))
-      return new pgsql(str);
+  var pgsql = sql._extension();
 
-    return sql.apply(this, arguments);
-  }
-  pgsql = sql.inherits(pgsql, sql);
-  for (var p in sql) {
-    if (sql.hasOwnProperty(p))
-      pgsql[p] = sql[p];
-  }
-
-
-  function construct(constructor, args) {
-      function F() {
-          return constructor.apply(this, args);
-      }
-      F.prototype = constructor.prototype;
-      return new F();
-  }
-
-  function makeSubclass(base) {
-    var cls = function () {
-      if (!(this instanceof cls))
-        return construct(cls, arguments);
-
-      base.apply(this, arguments);
-    }
-
-    var sub = sql.inherits(cls, base);
-    sub.defineClause = base.defineClause;
-    sub.prototype.clauses = base.prototype.clauses.slice();
-
-    return sub;
-  }
-
-  var Select = pgsql.select = makeSubclass(sql.select);
-  var Insert = pgsql.insert = makeSubclass(sql.insert);
-  var Update = pgsql.update = makeSubclass(sql.update);
-  var Delete = pgsql.delete = makeSubclass(sql.delete);
+  var Select = pgsql.select;
+  var Insert = pgsql.insert;
+  var Update = pgsql.update;
+  var Delete = pgsql.delete;
 
   Insert.prototype.returning =
     Update.prototype.returning =
