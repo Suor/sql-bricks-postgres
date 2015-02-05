@@ -142,4 +142,30 @@ describe('LIMIT ... OFFSET', function() {
   });
 });
 
+describe('JSON', function() {
+  describe('Objects', function() {
+    it('should handle UPDATE', function() {
+      assert.equal(update('user').set({'address': { state: "CA" }}).where({'lname': 'Flintstone'}).toString(),
+        "UPDATE \"user\" SET address = '{\"state\":\"CA\"}' WHERE lname = 'Flintstone'");
+    });
+
+    it('should handle INSERT', function() {
+      assert.equal(insert('user').values({'address': { state: "CA" }}).toString(),
+        "INSERT INTO \"user\" (address) VALUES ('{\"state\":\"CA\"}')");
+    });
+  });
+
+  describe('Arrays', function() {
+    it('should handle UPDATE', function() {
+      assert.equal(update('user').set({'numbers': [42, 84]}).where({'lname': 'Flintstone'}).toString(),
+        "UPDATE \"user\" SET numbers = '[42,84]' WHERE lname = 'Flintstone'");
+    });
+
+    it('should handle INSERT', function() {
+      assert.equal(insert('user').values({'numbers': [42, 84]}).toString(),
+        "INSERT INTO \"user\" (numbers) VALUES ('[42,84]')");
+    });
+  });
+});
+
 })();
