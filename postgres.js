@@ -137,11 +137,20 @@
     return alias;
   }
 
+  // Convert objects to JSON
+  // HACK: we are pollluting sql namepsace here, but currently there is no way around,
+  //       see https://github.com/CSNW/sql-bricks/issues/62
+  var _convert = sql.convert;
+  sql.convert = function (val) {
+    if (_.isObject(val) && !_.isArray(val) && !_.isArguments(val))
+      return _convert(JSON.stringify(val));
+
+    return _convert(val);
+  }
+
   if (typeof exports != 'undefined')
     module.exports = pgsql;
   else
     window.PostgresBricks = pgsql;
 
 })();
-
-
