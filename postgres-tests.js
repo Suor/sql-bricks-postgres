@@ -48,6 +48,11 @@ describe('Postgres extension for SQLBricks', function() {
       "INSERT INTO \"user\" (fname) VALUES ('Fred') RETURNING *");
   });
 
+  it('should handle INSERT ... SELECT ... RETURNING', function() {
+    assert.equal(insert('user').select().from('old_user').returning('*').toString(),
+      "INSERT INTO \"user\" SELECT * FROM old_user RETURNING *");
+  });
+
   it('should handle DELETE ... RETURNING', function() {
     assert.equal(del('user').where({'lname': 'Flintstone'}).returning('*').toString(),
       "DELETE FROM \"user\" WHERE lname = 'Flintstone' RETURNING *");

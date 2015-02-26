@@ -25,6 +25,12 @@
       return this._addListArgs(arguments, '_returning');
     };
 
+  Insert.prototype.select = function select() {
+    var select = Insert.super_.prototype.select.apply(this, arguments);
+    select.returning = this.returning.bind(this);
+    return select;
+  };
+
   Delete.prototype.using = function() {
     return this._addListArgs(arguments, '_using');
   };
