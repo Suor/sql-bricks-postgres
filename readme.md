@@ -103,11 +103,12 @@ sql.values({field: null}).types({field: 'int'}).toString()
 ```
 
 ## ILIKE
+
 `ILIKE` is a case insensitive `LIKE` statement
 
 ```js
-sql.select("text").from("example").where(ilike("text", "%EASY%PEASY%"))
-// SELECT text FROM example WHERE text ILIKE %EASY%PEASY%
+sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
+// SELECT text FROM example WHERE text ILIKE '%EASY%PEASY%'
 ```
 
 
