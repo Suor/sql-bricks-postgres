@@ -71,6 +71,30 @@
   };
   Update.defineClause('from', '{{#if _from}}FROM {{tables _from}}{{/if}}', {after: 'set'});
 
+  // ilike
+  // --------------------------------------------------------
+  pgsql.ilike = function (col, val, escape_char) {
+    return new ILike(col, val, escape_char); 
+  };
+
+  var ILike = sql.inherits(function ILike(col, val, escape_char) {
+    this.col = col;
+    this.val = val;
+    this.escape_char = escape_char;
+  }, sql.like("", "").constructor);
+
+
+  ILike.prototype.clone = function clone() {
+    return new ILike(this.col, this.val, this.escape_char);
+  };
+
+  ILike.prototype.toString = function(opts) {
+    var exp = sql._handleColumn(this.col, opts) + ' ILIKE ' + sql._handleValue(this.val, opts);
+    if (this.escape_char)
+      exp += " ESCAPE '" + this.escape_char + "'";
+    return exp;
+  };
+
   // VALUES statement for SELECT/UPDATE/DELETE ... FROM VALUES
   function Values(_values) {
     if (!(this instanceof Values))
