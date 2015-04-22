@@ -73,7 +73,7 @@ describe('Postgres extension for SQLBricks', function() {
 
     it("should generate an ilike clause", function () {
       var data = sql.select().from("val")
-        .where(sql.and(sql.ilike("val.name", "foo")));
+        .where(sql.ilike("val.name", "foo"));
 
       assert.equal(data.toString(),
         "SELECT * FROM val WHERE val.name ILIKE 'foo'");
