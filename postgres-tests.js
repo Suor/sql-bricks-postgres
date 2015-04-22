@@ -69,6 +69,18 @@ describe('Postgres extension for SQLBricks', function() {
       'UPDATE setting SET value = V.value FROM val as V WHERE name = V.name')
   })
 
+  describe("ilike", function () {
+
+    it("should generate an ilike clause", function () {
+      var data = sql.select().from("val")
+        .where(sql.and(sql.ilike("val.name", "foo")));
+
+      assert.equal(data.toString(),
+        "SELECT * FROM val WHERE val.name ILIKE 'foo'");
+    });
+
+  });
+
   describe('Values', function () {
     it('should work with select', function() {
       var data = [{name: 'a', value: 1}, {name: 'b', value: 2}]

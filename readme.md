@@ -102,6 +102,15 @@ sql.values({field: null}).types({field: 'int'}).toString()
 // VALUES (null::int)
 ```
 
+## ILIKE
+`ILIKE` is a case insensitive `LIKE` statement
+
+```js
+sql.select("text").from("example").where(ilike("text", "%EASY%PEASY%"))
+// SELECT text FROM example WHERE text ILIKE %EASY%PEASY%
+```
+
+
 ## See also
 
 [pg-bricks](https://github.com/Suor/pg-bricks) - A PostgreSQL client based on this library, handling connections, transactions, query execution and more.
