@@ -112,6 +112,19 @@ sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
 ```
 
 
+## Even Harder Things
+
+PostgreSQL has lots of functions and operators so it's inpractical to support everything,
+instead simple fallback is offered:
+
+```js
+select().from('time_limit')
+        .where(sql('tsrange(start, end) @> tsrange($, $)', t1, t2))
+// SELECT * FROM time_limit WHERE tsrange(start, end) @> tsrange($1, $2)
+```
+
+Note `$` placeholders.
+
 ## See also
 
 [pg-bricks](https://github.com/Suor/pg-bricks) - A PostgreSQL client based on this library, handling connections, transactions, query execution and more.
