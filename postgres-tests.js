@@ -96,12 +96,12 @@ describe('Postgres extension for SQLBricks', function() {
 
   });
 
-  describe.only("collate", function () {
+  describe("collate", function () {
     it("should generate a collate clause", function () {
       var data = sql.select("*")
         .from("contacts")
         .orderBy("contact.name")
-        .collate("en_EN", "pg_PG")
+        .collate("en_EN")
 
       var expected =
         'SELECT * FROM contacts ORDER BY contact.name COLLATE "en_EN"';
