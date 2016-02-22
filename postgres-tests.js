@@ -86,7 +86,6 @@ describe('Postgres extension for SQLBricks', function() {
   });
 
   describe("ilike", function () {
-
     it("should generate an ilike clause", function () {
       var data = sql.select().from("val")
         .where(sql.ilike("val.name", "foo"));
@@ -95,6 +94,44 @@ describe('Postgres extension for SQLBricks', function() {
         "SELECT * FROM val WHERE val.name ILIKE 'foo'");
     });
 
+  });
+
+  describe.only("collate", function () {
+    it("should generate a collate clause", function () {
+      var data = sql.select("*")
+        .from("contacts")
+        .orderBy("contact.name")
+        .collate("en_EN", "pg_PG")
+
+      var expected =
+        'SELECT * FROM contacts ORDER BY contact.name COLLATE "en_EN"';
+
+      assert.equal(data.toString(), expected);
+    });
+
+    it("should accept n parameters", function () {
+      var data = sql.select("*")
+        .from("contacts")
+        .orderBy("contact.name")
+        .collate("en_EN", "pg_PG")
+
+      var expected =
+        'SELECT * FROM contacts ORDER BY contact.name COLLATE "en_EN", "pg_PG"';
+
+      assert.equal(data.toString(), expected);
+    });
+
+    it("should handle manual escaping", function () {
+      var data = sql.select("*")
+        .from("contacts")
+        .orderBy("contact.name")
+        .collate("en_EN", '"pg_PG"')
+
+      var expected =
+        'SELECT * FROM contacts ORDER BY contact.name COLLATE "en_EN", "pg_PG"';
+
+      assert.equal(data.toString(), expected);
+    });
   });
 
   describe('Values', function () {
