@@ -111,6 +111,16 @@ sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
 // SELECT text FROM example WHERE text ILIKE '%EASY%PEASY%'
 ```
 
+## COLLATE
+
+Specify the sort order and character classification behavior of data per-column
+
+```js
+// Order by name, case insensitive
+sql.select("*").from("contacts").orderBy("contact.name").collate("en_EN")
+// SELECT * FROM contacts ORDER BY contact.name COLLATE "en_EN"
+```
+
 
 ## Even Harder Things
 

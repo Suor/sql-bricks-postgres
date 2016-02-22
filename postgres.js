@@ -52,6 +52,10 @@
     this._offset = val;
     return this;
   };
+  Select.prototype.collate = function(val) {
+    this._cols = val;
+    return this;
+  };
 
   Select.defineClause(
     'limit',
@@ -65,6 +69,16 @@
     {after: 'limit'}
   );
 
+  Select.prototype.collate = function() {
+    return this._addListArgs(arguments, '_cols');
+  }
+
+  Select.defineClause(
+    'collate',
+    '{{#ifNotNull _cols}}COLLATE {{columns _cols}}{{/ifNotNull}}',
+    {after: 'limit'}
+  );
+
   // UPDATE ... FROM
   Update.prototype.from = function() {
     return this._addListArgs(arguments, '_from');
@@ -74,7 +88,7 @@
   // ilike
   // --------------------------------------------------------
   pgsql.ilike = function (col, val, escape_char) {
-    return new ILike(col, val, escape_char); 
+    return new ILike(col, val, escape_char);
   };
 
   var ILike = sql.inherits(function ILike(col, val, escape_char) {
