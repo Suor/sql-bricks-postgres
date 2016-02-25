@@ -172,6 +172,10 @@
   //       see https://github.com/CSNW/sql-bricks/issues/62
   var _convert = sql.convert;
   sql.convert = function (val) {
+    // support pg types if available. this handles types like interval.
+    if (val && typeof val.toPostgres === 'function') {
+        val = val.toPostgres();
+    }
     if (_.isObject(val) && !_.isArray(val) && !_.isArguments(val))
       return _convert(JSON.stringify(val));
 
