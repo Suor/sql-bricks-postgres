@@ -119,11 +119,12 @@ instead simple fallback is offered:
 
 ```js
 select().from('time_limit')
-        .where(sql('tsrange(start, end) @> tsrange($, $)', t1, t2))
+        .where(sql('tsrange(start, end) @> tsrange($1, $2)', t1, t2))
 // SELECT * FROM time_limit WHERE tsrange(start, end) @> tsrange($1, $2)
 ```
 
-Note `$` placeholders.
+Note `$<number>` placeholders.
+
 
 ## See also
 
