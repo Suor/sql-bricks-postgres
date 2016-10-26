@@ -111,6 +111,10 @@ sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
 // SELECT text FROM example WHERE text ILIKE '%EASY%PEASY%'
 ```
 
+## PostgreSQL Type Compatability
+Supports [node-postgres](https://github.com/brianc/node-postgres) `toPostgres()` conventions to format Javascript appropriately for PostgreSQL.
+See [postgres-interval](https://github.com/bendrucker/postgres-interval) for an example of this pattern in action. ([index.js#L14-L22](https://github.com/bendrucker/postgres-interval/blob/master/index.js#L14-L22))
+
 
 ## Even Harder Things
 
