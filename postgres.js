@@ -182,6 +182,11 @@
     return _convert(val);
   }
 
+  // Use SQL-99 syntax for arrays since it's easier to implement
+  sql.conversions.Array = function(arr) {
+    return 'ARRAY[' + arr.map(sql.convert).join(', ') + ']';
+  };
+
   if (typeof exports != 'undefined')
     module.exports = pgsql;
   else
