@@ -3,6 +3,8 @@
 This is a lightweight, schemaless library helping you to generate statements for PostgreSQL.
 It is based on [sql-bricks](https://github.com/CSNW/sql-bricks) and adds PostgreSQL specific things into it.
 
+You might also want to take a look at [pg-bricks](https://github.com/Suor/pg-bricks), which adds query execution, connections and transaction handling on top of this library.
+
 
 ## Installation
 
@@ -132,8 +134,3 @@ select().from('time_limit')
 ```
 
 Note `$<number>` placeholders.
-
-
-## See also
-
-[pg-bricks](https://github.com/Suor/pg-bricks) - A PostgreSQL client based on this library, handling connections, transactions, query execution and more.
