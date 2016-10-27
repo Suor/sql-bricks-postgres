@@ -21,6 +21,10 @@ var sql = PostgresBricks;
 
 sql.select().from('user').where({name: 'Fred'}).toParams();
 // -> {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred']}
+
+sql.select().from('user').where({name: 'Fred'}).toString();
+// -> 'SELECT * FROM "user" WHERE name = \'Fred\''
+// NOTE: never use .toString() to execute a query, leave values for db library to quote
 ```
 
 You can read about basic flavor of how this thing works in [sql-bricks documentation](http://csnw.github.io/sql-bricks). Here go PostgreSQL specifics.
