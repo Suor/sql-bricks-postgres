@@ -1,3 +1,11 @@
+0.4.3
+- play nicely with .toPostgres() types (Brent)
+- fixed array quotation
+- updated sql-bricks to 2.x (backward compatible for us)
+
+0.4.2
+- updated sql-bricks to 1.2.2
+
 0.4.1
 - added ILIKE support (Pholey)
 

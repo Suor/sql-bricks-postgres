@@ -3,6 +3,8 @@
 This is a lightweight, schemaless library helping you to generate statements for PostgreSQL.
 It is based on [sql-bricks](https://github.com/CSNW/sql-bricks) and adds PostgreSQL specific things into it.
 
+You might also want to take a look at [pg-bricks](https://github.com/Suor/pg-bricks), which adds query execution, connections and transaction handling on top of this library.
+
 
 ## Installation
 
@@ -21,6 +23,10 @@ var sql = PostgresBricks;
 
 sql.select().from('user').where({name: 'Fred'}).toParams();
 // -> {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred']}
+
+sql.select().from('user').where({name: 'Fred'}).toString();
+// -> 'SELECT * FROM "user" WHERE name = \'Fred\''
+// NOTE: never use .toString() to execute a query, leave values for db library to quote
 ```
 
 You can read about basic flavor of how this thing works in [sql-bricks documentation](http://csnw.github.io/sql-bricks). Here go PostgreSQL specifics.
@@ -111,7 +117,20 @@ sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
 // SELECT text FROM example WHERE text ILIKE '%EASY%PEASY%'
 ```
 
+## PostgreSQL Type Compatability
+Supports [node-postgres](https://github.com/brianc/node-postgres) `toPostgres()` conventions to format Javascript appropriately for PostgreSQL.
+See [postgres-interval](https://github.com/bendrucker/postgres-interval) for an example of this pattern in action. ([index.js#L14-L22](https://github.com/bendrucker/postgres-interval/blob/master/index.js#L14-L22))
 
-## See also
 
-[pg-bricks](https://github.com/Suor/pg-bricks) - A PostgreSQL client based on this library, handling connections, transactions, query execution and more.
+## Even Harder Things
+
+PostgreSQL has lots of functions and operators so it's inpractical to support everything,
+instead simple fallback is offered:
+
+```js
+select().from('time_limit')
+        .where(sql('tsrange(start, end) @> tsrange($1, $2)', t1, t2))
+// SELECT * FROM time_limit WHERE tsrange(start, end) @> tsrange($1, $2)
+```
+
+Note `$<number>` placeholders.

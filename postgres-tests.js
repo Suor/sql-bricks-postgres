@@ -69,6 +69,22 @@ describe('Postgres extension for SQLBricks', function() {
       'UPDATE setting SET value = V.value FROM val as V WHERE name = V.name')
   })
 
+  it('should handle sql() params', function() {
+    var query = select().from('time_limit')
+                        .where(sql('tsrange(start, end) @> tsrange($, $)',
+                                   '2014-12-06T22:35:00', '2014-12-06T22:36:00'))
+    assert.deepEqual(query.toParams(), {
+      text: 'SELECT * FROM time_limit WHERE tsrange(start, end) @> tsrange($1, $2)',
+      values: ['2014-12-06T22:35:00', '2014-12-06T22:36:00']
+    })
+  });
+
+  // Fails now, see https://github.com/CSNW/sql-bricks/issues/77
+  it.skip('should handle sql() params in tables', function() {
+    var query = select().from('place', sql('plainto_tsquery($)', 'burger'))
+    assert.equal(query.toString(), "SELECT * FROM time_limit WHERE plainto_tsquery('burger')")
+  });
+
   describe("ilike", function () {
 
     it("should generate an ilike clause", function () {

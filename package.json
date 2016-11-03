@@ -1,6 +1,6 @@
 {
   "name": "sql-bricks-postgres",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "author": "Alexander Schepanovski <suor.web@gmail.com> (http://hackflow.com)",
   "contributors": ["Peter Rust <peter@cornerstonenw.com>"],
   "description": "Transparent, Schemaless SQL Generation for the PostgreSQL",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "underscore": "^1.4.x",
-    "sql-bricks": "^1.1.0"
+    "sql-bricks": "^2"
   },
   "devDependencies": {
     "mocha": "1.21.x"

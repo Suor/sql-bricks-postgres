@@ -71,28 +71,6 @@
   };
   Update.defineClause('from', '{{#if _from}}FROM {{tables _from}}{{/if}}', {after: 'set'});
 
-  // jsonbContains
-  // --------------------------------------------------------
-  pgsql.jsonbContains = function (col, json) {
-    return new JsonbContains(col, json);
-  };
-
-  var JsonbContains = sql.inherits(function JsonbContains(col, json) {
-    this.col = col;
-    this.json = json;
-  }, sql.like("", "").constructor);
-
-  JsonbContains.prototype.clone = function clone() {
-    return new JsonbContains(this.col, this.json);
-  };
-
-  JsonbContains.prototype.toString = function(opts) {
-    var exp = sql._handleColumn(this.col) + ' @> ' + sql.convert(this.json);
-    if (this.escape_char)
-      exp += " ESCAPE '" + this.escape_char + "'";
-    return exp;
-  };
-
   // ilike
   // --------------------------------------------------------
   pgsql.ilike = function (col, val, escape_char) {
@@ -194,11 +172,20 @@
   //       see https://github.com/CSNW/sql-bricks/issues/62
   var _convert = sql.convert;
   sql.convert = function (val) {
+    // support pg types if available. this handles types like interval.
+    if (val && typeof val.toPostgres === 'function') {
+        val = val.toPostgres();
+    }
     if (_.isObject(val) && !_.isArray(val) && !_.isArguments(val))
       return _convert(JSON.stringify(val));
 
     return _convert(val);
   }
+
+  // Use SQL-99 syntax for arrays since it's easier to implement
+  sql.conversions.Array = function(arr) {
+    return 'ARRAY[' + arr.map(sql.convert).join(', ') + ']';
+  };
 
   if (typeof exports != 'undefined')
     module.exports = pgsql;
