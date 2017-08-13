@@ -1,3 +1,6 @@
+0.5.0
+- support ON CONFLICT ... DO NOTHING / DO UPDATE
+
 0.4.3
 - play nicely with .toPostgres() types (Brent)
 - fixed array quotation
