@@ -153,6 +153,35 @@ describe('Postgres extension for SQLBricks', function() {
     assert.equal(select().from('user').where(sql.or({'name': 'Fred'}, {'name': 'Bob'})).toString(),
       "SELECT * FROM \"user\" WHERE name = 'Fred' OR name = 'Bob'");
   })
+
+  describe('onConflict', function() {
+    it('should take column', function() {
+      assert.equal(insert('user', {name: 'Alex'}).onConflict('name').doNothing().toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT (name) DO NOTHING")
+    })
+
+    it('should take column', function() {
+      assert.equal(insert('user', {name: 'Alex'}).onConflict().onConstraint('some_pkey')
+            .doNothing().toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT ON CONSTRAINT some_pkey DO NOTHING")
+    })
+
+    it('should support partial index', function() {
+      assert.equal(insert('user', {name: 'Alex'}).onConflict('name').where({is_active: true})
+          .doNothing().toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT (name) WHERE is_active = TRUE DO NOTHING")
+    })
+
+    it('should make upsert', function() {
+      assert.equal(insert('user', {name: 'Alex'}).onConflict().doUpdate().toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name")
+    })
+
+    it('should filter update', function() {
+      assert.equal(insert('user', {name: 'Alex'}).onConflict().doUpdate().where(sql('is_active')).toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name WHERE is_active")
+    })
+  })
 });
 
 describe('LIMIT ... OFFSET', function() {

@@ -69,6 +69,35 @@ sql.delete('user').using('address').where('user.addr_fk', sql('address.pk'))
 ```
 
 
+### ON CONFLICT ... DO NOTHING / DO UPDATE ...
+
+The most popular use case is probably UPSERT:
+
+```js
+sql.insert('user', {name: 'Alex', age: 34}).onConflict('name').doUpdate('age')
+// -> "INSERT INTO \"user\" (name) VALUES ('Alex', 34)
+//     ON CONFLICT (name) DO UPDATE SET age = EXCLUDED.age"
+
+// sql-bricks-postgres will update all fields if none are specified
+sql.insert('user', {name: 'Alex', age: 34}).onConflict('name').doUpdate()
+// -> "INSERT INTO \"user\" (name) VALUES ('Alex', 34)
+//   ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age"
+```
+
+Other clauses such as `DO NOTHING`, `ON CONSTRAINT` and `WHERE` are also supported:
+
+```js
+sql.insert('user', ...).onConflict('name').where({is_active: true}).doNothing()
+// -> "INSERT INTO \"user\" ... VALUES ...
+//     ON CONFLICT (name) WHERE is_active = true DO NOTHING
+
+sql.insert('user', ...).onConflict().onConstraint('name_idx')
+    .doUpdate().where(sql('is_active'))
+// -> "INSERT INTO \"user\" ... VALUES ...
+//     ON CONFLICT ON CONSTRAINT name_idx DO UPDATE SET ... WHERE is_active"
+```
+
+
 ### FROM VALUES
 
 `VALUES` statement is a handy way to provide data with a query. It is most known in a context of `INSERT`, but could be used for other things like altering selects and doing mass updates:
@@ -76,7 +105,7 @@ sql.delete('user').using('address').where('user.addr_fk', sql('address.pk'))
 ```js
 var data = [{name: 'a', value: 1}, {name: 'b', value: 2}];
 sql.select().from(sql.values(data)).toString();
-// -> "SELECT * FROM (VALUES ('a', 1), ('b', 2))");
+// -> "SELECT * FROM (VALUES ('a', 1), ('b', 2))"
 
 sql.update('setting s', {value: sql('v.value')})
    .from(sql.values({name: 'a', value: 1}).as('v').columns())

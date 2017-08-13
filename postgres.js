@@ -74,7 +74,7 @@
   // ilike
   // --------------------------------------------------------
   pgsql.ilike = function (col, val, escape_char) {
-    return new ILike(col, val, escape_char); 
+    return new ILike(col, val, escape_char);
   };
 
   var ILike = sql.inherits(function ILike(col, val, escape_char) {
@@ -94,6 +94,62 @@
       exp += " ESCAPE '" + this.escape_char + "'";
     return exp;
   };
+
+  // ON CONFLICT ... DO NOTHING / DO UPDATE SET ...
+  Insert.prototype.onConflict = function () {
+    this._addListArgs(arguments, '_onConflict');
+    this.where = this.and = function() {
+      return this._addExpression(arguments, '_onConflictWhere');
+    }
+    this.onConstraint = function(name) {
+      this._onConstraint = name;
+      return this;
+    }
+    return this;
+  }
+
+  Insert.prototype.doNothing = function () {
+    this._doNothing = true;
+    return this;
+  }
+
+  Insert.prototype.doUpdate = function (cols) {
+    this._doUpdate = cols || true;
+    this.where = this.and = function () {
+      return this._addExpression(arguments, '_doUpdateWhere');
+    }
+    return this;
+  }
+
+  // Add "template tag"
+  sql.templ.helpers.ifNotEmpty = function(val, opts, contents, ctx) {
+    return !_.isEmpty(val) ? sql.templ(contents, ctx, opts) : ''; };
+
+  Insert.defineClause(
+    'onConflict',
+    '{{#ifNotNull _onConflict}}ON CONFLICT{{#ifNotEmpty _onConflict}} ({{columns _onConflict}}){{/ifNotEmpty}}{{#if _onConflictWhere}} WHERE {{expression _onConflictWhere}}{{/if}}{{/ifNotNull}}',
+    {after: 'values'}
+  );
+  Insert.defineClause('onConstraint', '{{#if _onConstraint}}ON CONSTRAINT {{_onConstraint}}{{/if}}',
+    {after: 'onConflict'});
+  Insert.defineClause('doNothing', '{{#if _doNothing}}DO NOTHING{{/if}}', {after: 'onConstraint'});
+  Insert.defineClause('doUpdate', function(opts) {
+      if(!this._doUpdate) return;
+
+      var columns = this._doUpdate;
+      if (this._doUpdate === true) columns = _.keys(this._values[0]);
+
+      return 'DO UPDATE SET ' + columns.map(function(col) {
+        var col = sql._handleColumn(col, opts);
+        return col + ' = EXCLUDED.' + col;
+      }).join(', ');
+    }, {after: 'onConstraint'}
+  );
+  Insert.defineClause(
+    'doUpdateWhere',
+    '{{#if _doUpdateWhere}}WHERE {{expression _doUpdateWhere}}{{/if}}',
+    {after: 'doUpdate'}
+  );
 
   // VALUES statement for SELECT/UPDATE/DELETE ... FROM VALUES
   function Values(_values) {
