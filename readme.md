@@ -15,11 +15,13 @@ var sql = require('sql-bricks-postgres');
 var sql = PostgresBricks;
 
 sql.select().from('user').where({name: 'Fred'}).toParams();
-// -> {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred']}
+// {text: 'SELECT * FROM "user" WHERE name = $1', values: ['Fred']}
 
 sql.select().from('user').where({name: 'Fred'}).toString();
-// -> 'SELECT * FROM "user" WHERE name = \'Fred\''
-// NOTE: never use .toString() to execute a query, leave values for db library to quote
+// SELECT * FROM "user" WHERE name = 'Fred'
+
+// NOTE: never use .toString() to execute a query,
+//       leave values for db library to quote
 ```
 
 You can read about basic flavor of how this thing works in [sql-bricks documentation](http://csnw.github.io/sql-bricks). Here go PostgreSQL specifics.
@@ -28,19 +30,19 @@ You can read about basic flavor of how this thing works in [sql-bricks documenta
 ### LIMIT and OFFSET
 
 ```js
-sql.select().from('user').limit(10).offset(20).toString();
-// -> 'SELECT * FROM "user" LIMIT 10 OFFSET 20'
+sql.select().from('user').limit(10).offset(20).toString()
+// SELECT * FROM "user" LIMIT 10 OFFSET 20
 ```
 
 
 ### RETURNING
 
 ```js
-sql.update('user', {name: 'John'}).where({id: 1}).returning('*').toString();
-// -> 'UPDATE "user" SET name = 'John' WHERE id = 1 RETURNING *'
+sql.update('user', {name: 'John'}).where({id: 1}).returning('*')
+// UPDATE "user" SET name = 'John' WHERE id = 1 RETURNING *
 
-sql.delete('job').where({finished: true}).returning('id').toString();
-// -> 'DELETE FROM job WHERE finished = TRUE RETURNING id'
+sql.delete('job').where({finished: true}).returning('id')
+// DELETE FROM job WHERE finished = TRUE RETURNING id
 ```
 
 
@@ -48,17 +50,18 @@ sql.delete('job').where({finished: true}).returning('id').toString();
 
 ```js
 sql.update('setting', {value: sql('V.value')})
-   .from('val as V').where({name: sql('V.name')}).toString();
-// -> 'UPDATE setting SET value = V.value FROM val as V WHERE name = V.name'
+   .from('val as V').where({name: sql('V.name')}).toString()
+// UPDATE setting SET value = V.value
+//   FROM val as V WHERE name = V.name
 ```
 
 
 ### DELETE ... USING
 
 ```js
-sql.delete('user').using('address').where('user.addr_fk', sql('address.pk'))
-   .toString();
-// -> 'DELETE FROM "user" USING address WHERE "user".addr_fk = address.pk');
+sql.delete('user').using('address')
+   .where('user.addr_fk', sql('address.pk'))
+// DELETE FROM user USING address WHERE user.addr_fk = address.pk
 ```
 
 
@@ -67,27 +70,33 @@ sql.delete('user').using('address').where('user.addr_fk', sql('address.pk'))
 The most popular use case is probably UPSERT:
 
 ```js
-sql.insert('user', {name: 'Alex', age: 34}).onConflict('name').doUpdate('age')
-// -> "INSERT INTO \"user\" (name) VALUES ('Alex', 34)
-//     ON CONFLICT (name) DO UPDATE SET age = EXCLUDED.age"
+sql.insert('user', {name: 'Alex', age: 34})
+   .onConflict('name').doUpdate('age')
+// INSERT INTO "user" (name) VALUES ('Alex', 34)
+//     ON CONFLICT (name) DO UPDATE SET age = EXCLUDED.age
 
 // sql-bricks-postgres will update all fields if none are specified
-sql.insert('user', {name: 'Alex', age: 34}).onConflict('name').doUpdate()
-// -> "INSERT INTO \"user\" (name) VALUES ('Alex', 34)
-//   ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age"
+sql.insert('user', {name: 'Alex', age: 34})
+   .onConflict('name').doUpdate()
+// INSERT INTO "user" (name) VALUES ('Alex', 34)
+//   ON CONFLICT (name)
+//   DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age
 ```
 
-Other clauses such as `DO NOTHING`, `ON CONSTRAINT` and `WHERE` are also supported:
+Other clauses such as `DO NOTHING`, `ON CONSTRAINT` and `WHERE` are
+also supported:
 
 ```js
-sql.insert('user', ...).onConflict('name').where({is_active: true}).doNothing()
-// -> "INSERT INTO \"user\" ... VALUES ...
+sql.insert('user', ...).onConflict('name').where({is_active: true})
+   .doNothing()
+// INSERT INTO "user" ... VALUES ...
 //     ON CONFLICT (name) WHERE is_active = true DO NOTHING
 
 sql.insert('user', ...).onConflict().onConstraint('name_idx')
     .doUpdate().where(sql('is_active'))
-// -> "INSERT INTO \"user\" ... VALUES ...
-//     ON CONFLICT ON CONSTRAINT name_idx DO UPDATE SET ... WHERE is_active"
+// INSERT INTO "user" ... VALUES ...
+//     ON CONFLICT ON CONSTRAINT name_idx
+//     DO UPDATE SET ... WHERE is_active"
 ```
 
 
@@ -98,13 +107,13 @@ sql.insert('user', ...).onConflict().onConstraint('name_idx')
 ```js
 var data = [{name: 'a', value: 1}, {name: 'b', value: 2}];
 sql.select().from(sql.values(data)).toString();
-// -> "SELECT * FROM (VALUES ('a', 1), ('b', 2))"
+// SELECT * FROM (VALUES ('a', 1), ('b', 2))
 
 sql.update('setting s', {value: sql('v.value')})
    .from(sql.values({name: 'a', value: 1}).as('v').columns())
    .where('s.name', sql('v.name')}).toString()
-// -> "UPDATE setting s SET value = v.value
-//     FROM (VALUES ('a', 1)) v (name, value) WHERE s.name = v.name"
+// UPDATE setting s SET value = v.value
+//   FROM (VALUES ('a', 1)) v (name, value) WHERE s.name = v.name
 ```
 
 Sometimes you need types on values columns for query to work. You can use `.types()` method to provide them:
@@ -135,8 +144,8 @@ sql.values({field: null}).types({field: 'int'}).toString()
 `ILIKE` is a case insensitive `LIKE` statement
 
 ```js
-sql.select("text").from("example").where(sql.ilike("text", "%EASY%PEASY%"))
-// SELECT text FROM example WHERE text ILIKE '%EASY%PEASY%'
+sql.select("text").from("example").where(sql.ilike("text", "%EASY%"))
+// SELECT text FROM example WHERE text ILIKE '%EASY%'
 ```
 
 ## PostgreSQL Type Compatability
@@ -152,7 +161,8 @@ instead simple fallback is offered:
 ```js
 select().from('time_limit')
         .where(sql('tsrange(start, end) @> tsrange($1, $2)', t1, t2))
-// SELECT * FROM time_limit WHERE tsrange(start, end) @> tsrange($1, $2)
+// SELECT * FROM time_limit
+// WHERE tsrange(start, end) @> tsrange($1, $2)
 ```
 
 Note `$<number>` placeholders.
