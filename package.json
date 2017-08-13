@@ -2,7 +2,9 @@
   "name": "sql-bricks-postgres",
   "version": "0.4.3",
   "author": "Alexander Schepanovski <suor.web@gmail.com> (http://hackflow.com)",
-  "contributors": ["Peter Rust <peter@cornerstonenw.com>"],
+  "contributors": [
+    "Peter Rust <peter@cornerstonenw.com>"
+  ],
   "description": "Transparent, Schemaless SQL Generation for the PostgreSQL",
   "homepage": "https://github.com/Suor/sql-bricks-postgres",
   "bugs": "https://github.com/Suor/sql-bricks-postgres/issues",
@@ -31,8 +33,8 @@
     "node": "*"
   },
   "dependencies": {
-    "underscore": "^1.4.x",
-    "sql-bricks": "^2"
+    "sql-bricks": "^2",
+    "underscore": "^1.4.x"
   },
   "devDependencies": {
     "mocha": "1.21.x"
