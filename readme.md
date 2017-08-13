@@ -6,13 +6,6 @@ It is based on [sql-bricks](https://github.com/CSNW/sql-bricks) and adds Postgre
 You might also want to take a look at [pg-bricks](https://github.com/Suor/pg-bricks), which adds query execution, connections and transaction handling on top of this library.
 
 
-## Installation
-
-```
-npm install sql-bricks-postgres
-```
-
-
 ## Usage
 
 ```javascript
