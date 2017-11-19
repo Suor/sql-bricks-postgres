@@ -240,7 +240,7 @@
 
   // Use SQL-99 syntax for arrays since it's easier to implement
   sql.conversions.Array = function(arr) {
-    const pgTypes = {
+    var pgTypes = {
       number: 'bigint[]',
       string: 'text[]'
     };
