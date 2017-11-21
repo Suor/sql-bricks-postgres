@@ -244,7 +244,7 @@
       number: 'bigint[]',
       string: 'text[]'
     };
-    return `ARRAY[${arr.map(sql.convert).join()}]::${pgTypes[(typeof arr[0]).toLowerCase()]}`;
+		return 'ARRAY[' + arr.map(sql.convert).join() + ']::' + pgTypes[(typeof arr[0]).toLowerCase()];
   };
 
   if (typeof exports !== 'undefined')
