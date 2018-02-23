@@ -224,7 +224,7 @@
   }
 
   // Convert objects to JSON
-  // HACK: we are pollluting sql namepsace here, but currently there is no way around,
+  // HACK: we are pollluting sql namespace here, but currently there is no way around,
   //       see https://github.com/CSNW/sql-bricks/issues/62
   var _convert = sql.convert;
   sql.convert = function (val) {
@@ -237,6 +237,9 @@
 
     return _convert(val);
   }
+
+  // HACK: changing sql._reserved globally, will alter behaviour of sql-bricks
+  sql._reserved.binary = 'binary';
 
   // Use SQL-99 syntax for arrays since it's easier to implement
   sql.conversions.Array = function(arr) {
