@@ -177,6 +177,21 @@ describe('Postgres extension for SQLBricks', function() {
         "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name")
     })
 
+    it('should make upsert, updating specific field', function() {
+      assert.equal(insert('user', {name: 'Alex', age: 30}).onConflict().doUpdate([ 'name' ]).toString(),
+        "INSERT INTO \"user\" (name, age) VALUES ('Alex', 30) ON CONFLICT DO UPDATE SET name = EXCLUDED.name")
+    })
+
+    it('should make upsert, skipping specific fields', function() {
+      assert.equal(insert('user', {name: 'Alex', age: 30, height: 5.11}).onConflict().doUpdate([ '-name', '-height' ]).toString(),
+        "INSERT INTO \"user\" (name, age, height) VALUES ('Alex', 30, 5.11) ON CONFLICT DO UPDATE SET age = EXCLUDED.age")
+    })
+
+    it('should make upsert, updating and skipping specific fields', function() {
+      assert.equal(insert('user', {name: 'Alex', age: 30, height: 5.11}).onConflict().doUpdate([ '-name', 'age' ]).toString(),
+        "INSERT INTO \"user\" (name, age, height) VALUES ('Alex', 30, 5.11) ON CONFLICT DO UPDATE SET age = EXCLUDED.age")
+    })
+
     it('should filter update', function() {
       assert.equal(insert('user', {name: 'Alex'}).onConflict().doUpdate().where(sql('is_active')).toString(),
         "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name WHERE is_active")
