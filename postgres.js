@@ -136,8 +136,23 @@
   Insert.defineClause('doUpdate', function(opts) {
       if(!this._doUpdate) return;
 
-      var columns = this._doUpdate;
-      if (this._doUpdate === true) columns = _.keys(this._values[0]);
+      var columns = _.keys(this._values[0]);
+      if (Array.isArray(this._doUpdate)) {
+
+        var regex = new RegExp('-', 'g')
+        var updateColumns = []
+        var skipColumns = []
+        this._doUpdate.map(function(col) {
+          if (col.startsWith('-')) {
+            var colName = col.replace(regex, '')
+            return skipColumns.push(colName)
+          }
+          updateColumns.push(col)
+        })
+
+        if (skipColumns.length > 0) columns = _.difference(columns, skipColumns)
+        if (updateColumns.length > 0) columns = _.intersection(columns, updateColumns)
+      }
 
       return 'DO UPDATE SET ' + columns.map(function(col) {
         var col = sql._handleColumn(col, opts);
