@@ -143,7 +143,7 @@
         var updateColumns = []
         var skipColumns = []
         this._doUpdate.map(function(col) {
-          if (col.startsWith('-')) {
+          if (col.indexOf('-') === 0) {
             var colName = col.replace(regex, '')
             return skipColumns.push(colName)
           }
