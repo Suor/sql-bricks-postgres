@@ -71,14 +71,20 @@ The most popular use case is probably UPSERT:
 
 ```js
 sql.insert('user', {name: 'Alex', age: 34})
-   .onConflict('name').doUpdate('age')
-// INSERT INTO "user" (name) VALUES ('Alex', 34)
+   .onConflict('name').doUpdate([ 'age' ])
+// INSERT INTO "user" (name, age) VALUES ('Alex', 34)
 //     ON CONFLICT (name) DO UPDATE SET age = EXCLUDED.age
+
+// sql-bricks-postgres will update all fields except those that are specified with "-" in front of their names
+sql.insert('user', {name: 'Alex', age: 34})
+   .onConflict('name').doUpdate([ '-age' ])
+// INSERT INTO "user" (name, age) VALUES ('Alex', 34)
+//     ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
 
 // sql-bricks-postgres will update all fields if none are specified
 sql.insert('user', {name: 'Alex', age: 34})
    .onConflict('name').doUpdate()
-// INSERT INTO "user" (name) VALUES ('Alex', 34)
+// INSERT INTO "user" (name, age) VALUES ('Alex', 34)
 //   ON CONFLICT (name)
 //   DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age
 ```
