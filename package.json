@@ -33,7 +33,7 @@
     "node": "*"
   },
   "dependencies": {
-    "sql-bricks": "git+https://github.com/CSNW/sql-bricks.git#v3.0.0-beta.4",
+    "sql-bricks": "^3",
     "underscore": "^1.4.x"
   },
   "devDependencies": {
