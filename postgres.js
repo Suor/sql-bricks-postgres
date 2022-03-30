@@ -36,12 +36,15 @@
   };
 
   // NOTE: clauses - a separate obstacle for clean extensions
-  var returning_tmpl = '{{#if _returning}}RETURNING {{columns _returning}}{{/if}}';
-  Insert.defineClause('returning', returning_tmpl, {after: 'values'});
-  Update.defineClause('returning', returning_tmpl, {after: 'where'});
-  Delete.defineClause('returning', returning_tmpl, {after: 'where'});
+  var returning_render_fn = function(opts) {
+    if (this._returning)
+      return `RETURNING ${sql._handleColumns(this._returning, opts)}`;
+  };
+  Insert.defineClause('returning', returning_render_fn, {after: 'values'});
+  Update.defineClause('returning', returning_render_fn, {after: 'where'});
+  Delete.defineClause('returning', returning_render_fn, {after: 'where'});
 
-  Delete.defineClause('using', '{{#if _using}}USING {{tables _using}}{{/if}}', {after: 'delete'});
+  Delete.defineClause('using', function(opts) { if (this._using) return `USING ${sql._handleTables(this._using, opts)}`; }, {after: 'delete'});
 
   // TODO: shouldn't LIMIT/OFFSET use handleValue()? Otherwise isn't it vulnerable to SQL Injection?
   Select.prototype.limit = function(val) {
@@ -55,13 +58,13 @@
 
   Select.defineClause(
     'limit',
-    '{{#ifNotNull _limit}}LIMIT {{_limit}}{{/ifNotNull}}',
+    function(opts) { if (this._limit != null) return `LIMIT ${this._limit}`; },
     {after: 'orderBy'}
   );
 
   Select.defineClause(
     'offset',
-    '{{#ifNotNull _offset}}OFFSET {{_offset}}{{/ifNotNull}}',
+    function(opts) { if (this._offset != null) return `OFFSET ${this._offset}`; },
     {after: 'limit'}
   );
 
@@ -69,7 +72,7 @@
   Update.prototype.from = function() {
     return this._addListArgs(arguments, '_from');
   };
-  Update.defineClause('from', '{{#if _from}}FROM {{tables _from}}{{/if}}', {after: 'set'});
+  Update.defineClause('from', function(opts) { if (this._from) return `FROM ${sql._handleTables(this._from, opts)}`; }, {after: 'set'});
 
   // ilike
   // --------------------------------------------------------
@@ -121,18 +124,16 @@
     return this;
   }
 
-  // Add "template tag"
-  sql.templ.helpers.ifNotEmpty = function(val, opts, contents, ctx) {
-    return !_.isEmpty(val) ? sql.templ(contents, ctx, opts) : ''; };
-
   Insert.defineClause(
     'onConflict',
-    '{{#ifNotNull _onConflict}}ON CONFLICT{{#ifNotEmpty _onConflict}} ({{columns _onConflict}}){{/ifNotEmpty}}{{#if _onConflictWhere}} WHERE {{expression _onConflictWhere}}{{/if}}{{/ifNotNull}}',
+    function(opts) {
+      if (this._onConflict != null)
+        return `ON CONFLICT${!_.isEmpty(this._onConflict) ? ` (${sql._handleColumns(this._onConflict, opts)})` : ''}${this._onConflictWhere ? ` WHERE ${sql._handleExpression(this._onConflictWhere, opts)}` : ''}`; },
     {after: 'values'}
   );
-  Insert.defineClause('onConstraint', '{{#if _onConstraint}}ON CONSTRAINT {{_onConstraint}}{{/if}}',
+  Insert.defineClause('onConstraint', function(opts) { if (this._onConstraint) return `ON CONSTRAINT ${this._onConstraint}`; },
     {after: 'onConflict'});
-  Insert.defineClause('doNothing', '{{#if _doNothing}}DO NOTHING{{/if}}', {after: 'onConstraint'});
+  Insert.defineClause('doNothing', function(opts) { if (this._doNothing) return `DO NOTHING`; }, {after: 'onConstraint'});
   Insert.defineClause('doUpdate', function(opts) {
       if(!this._doUpdate) return;
 
@@ -147,7 +148,7 @@
   );
   Insert.defineClause(
     'doUpdateWhere',
-    '{{#if _doUpdateWhere}}WHERE {{expression _doUpdateWhere}}{{/if}}',
+    function (opts) { if (this._doUpdateWhere) return `WHERE ${sql._handleExpression(this._doUpdateWhere, opts)}`; },
     {after: 'doUpdate'}
   );
 
