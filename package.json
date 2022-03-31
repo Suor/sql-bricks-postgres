@@ -33,7 +33,7 @@
     "node": "*"
   },
   "dependencies": {
-    "sql-bricks": "^2",
+    "sql-bricks": "^3",
     "underscore": "^1.4.x"
   },
   "devDependencies": {
