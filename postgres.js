@@ -103,26 +103,26 @@
     this._addListArgs(arguments, '_onConflict');
     this.where = this.and = function() {
       return this._addExpression(arguments, '_onConflictWhere');
-    }
+    };
     this.onConstraint = function(name) {
       this._onConstraint = name;
       return this;
-    }
+    };
     return this;
-  }
+  };
 
   Insert.prototype.doNothing = function () {
     this._doNothing = true;
     return this;
-  }
+  };
 
   Insert.prototype.doUpdate = function (cols) {
     this._doUpdate = cols || true;
     this.where = this.and = function () {
       return this._addExpression(arguments, '_doUpdateWhere');
-    }
+    };
     return this;
-  }
+  };
 
   Insert.defineClause(
     'onConflict',
@@ -177,7 +177,7 @@
       }
       : function (row, opts) {
         return sql._handleValues(_.values(row), opts);
-      }
+      };
 
     var values = this._values.map(function (row) {
       return '(' + handleRow(row, opts).join(', ') + ')';
@@ -190,7 +190,7 @@
   Values.prototype.types = function (types) {
     this._types = types || true;
     return this;
-  }
+  };
 
   function typeCoerce(val) {
     if (typeof val === 'number') {
@@ -211,7 +211,7 @@
   Values.prototype.columns = function () {
     this._columns = true;
     return this;
-  }
+  };
   Values.prototype.as = Select.prototype.as;
   Values.prototype._toNestedString = Select.prototype._toNestedString;
   Values.prototype._aliasToString = function (opts) {
@@ -222,7 +222,7 @@
       alias += ' (' + sql._handleColumns(_.keys(this._values[0])) + ')';
     }
     return alias;
-  }
+  };
 
   // Convert objects to JSON
   // HACK: we are pollluting sql namespace here, but currently there is no way around,
@@ -237,17 +237,21 @@
       return _convert(JSON.stringify(val));
 
     return _convert(val);
-  }
+  };
 
   // HACK: changing sql._reserved globally, will alter behaviour of sql-bricks
   sql._reserved.binary = 'binary';
 
   // Use SQL-99 syntax for arrays since it's easier to implement
   sql.conversions.Array = function(arr) {
-    return 'ARRAY[' + arr.map(sql.convert).join(', ') + ']';
+    var pgTypes = {
+      number: 'bigint[]',
+      string: 'text[]'
+    };
+		return 'ARRAY[' + arr.map(sql.convert).join() + ']::' + pgTypes[(typeof arr[0]).toLowerCase()];
   };
 
-  if (typeof exports != 'undefined')
+  if (typeof exports !== 'undefined')
     module.exports = pgsql;
   else
     window.PostgresBricks = pgsql;
