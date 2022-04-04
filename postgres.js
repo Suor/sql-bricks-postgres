@@ -138,7 +138,7 @@
     {after: 'onConflict'});
   Insert.defineClause(
     'doUpdateSet',
-    '{{#if _doUpdateSet}}DO UPDATE SET {{expression _doUpdateSet}}{{/if}}',
+    function (opts) { if (this._doUpdateSet) return `DO UPDATE SET ${sql._handleExpression(this._doUpdateSet, opts)}`; },
     {after: 'onConstraint'}
   );
   Insert.defineClause('doNothing', function(opts) { if (this._doNothing) return `DO NOTHING`; }, {after: 'onConstraint'});
