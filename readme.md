@@ -81,6 +81,14 @@ sql.insert('user', {name: 'Alex', age: 34})
 // INSERT INTO "user" (name) VALUES ('Alex', 34)
 //   ON CONFLICT (name)
 //   DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age
+
+// manipulate the data in the `DO UPDATE`:
+sql.insert('user', {name: 'Alex', age: 34})
+    .onConflict('name').doUpdate()
+    .set(sql('name = coalesce(EXCLUDED.name, $1), age = $2 + 10', t1, t2))
+// INSERT INTO "user" (name) VALUES ('Alex', 34)
+//   ON CONFLICT (name)
+//   DO UPDATE SET name = coalesce(EXCLUDED.name, $3), age = $4 + 10
 ```
 
 Other clauses such as `DO NOTHING`, `ON CONSTRAINT` and `WHERE` are

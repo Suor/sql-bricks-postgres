@@ -121,6 +121,9 @@
     this.where = this.and = function () {
       return this._addExpression(arguments, '_doUpdateWhere');
     }
+    this.set = this.and = function() {
+      return this._addExpression(arguments, '_doUpdateSet');
+    }
     return this;
   }
 
@@ -133,8 +136,14 @@
   );
   Insert.defineClause('onConstraint', function(opts) { if (this._onConstraint) return `ON CONSTRAINT ${this._onConstraint}`; },
     {after: 'onConflict'});
+  Insert.defineClause(
+    'doUpdateSet',
+    function (opts) { if (this._doUpdateSet) return `DO UPDATE SET ${sql._handleExpression(this._doUpdateSet, opts)}`; },
+    {after: 'onConstraint'}
+  );
   Insert.defineClause('doNothing', function(opts) { if (this._doNothing) return `DO NOTHING`; }, {after: 'onConstraint'});
   Insert.defineClause('doUpdate', function(opts) {
+      if(this._doUpdateSet) return;
       if(!this._doUpdate) return;
 
       var columns = this._doUpdate;
@@ -144,7 +153,7 @@
         var col = sql._handleColumn(col, opts);
         return col + ' = EXCLUDED.' + col;
       }).join(', ');
-    }, {after: 'onConstraint'}
+    }, {after: 'doUpdateSet'}
   );
   Insert.defineClause(
     'doUpdateWhere',

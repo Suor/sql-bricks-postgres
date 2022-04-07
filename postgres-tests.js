@@ -177,6 +177,12 @@ describe('Postgres extension for SQLBricks', function() {
         "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name")
     })
 
+    it('should make upsert with SQL function', function() {
+      assert.equal(insert('user', {name: 'Alex'})
+      .onConflict().doUpdate().set(sql('name = coalesce(EXCLUDED.name, $1)', "Alex")).toString(),
+        "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = coalesce(EXCLUDED.name, 'Alex')")
+    })
+
     it('should filter update', function() {
       assert.equal(insert('user', {name: 'Alex'}).onConflict().doUpdate().where(sql('is_active')).toString(),
         "INSERT INTO \"user\" (name) VALUES ('Alex') ON CONFLICT DO UPDATE SET name = EXCLUDED.name WHERE is_active")
