@@ -1,3 +1,10 @@
+0.6.0
+- use proper expression parsing in doUpdateSet (Daryl Chymko)
+- support DO UPDATE SET (Daryl Chymko)
+- updated sql-bricks to v3.0.0 from npm (Peter Rust)
+- made binary a reserved word
+- readme improvements
+
 0.5.0
 - support ON CONFLICT ... DO NOTHING / DO UPDATE
 
